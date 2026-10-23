@@ -1,0 +1,26 @@
+# Installed dependencies and build output
+node_modules/
+dist/
+release/
+coverage/
+
+# Personal room calibration and saved arenas
+/arena.json
+/arenas.json
+/track.json
+/breakout.json
+
+# Local review snapshots, generated previews and test output
+/tmp/
+/*.png
+/desktop-smoke.json
+*.log
+*.tmp
+
+# Local credentials and operating-system files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+Desktop.ini

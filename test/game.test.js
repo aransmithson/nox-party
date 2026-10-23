@@ -1,0 +1,10 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {Game} from '../game.js';
+const match=()=>{const g=new Game();g.add('A');g.add('B');g.start();for(let i=0;i<181;i++)g.step(1/60);return g;};
+test('four human players maximum, including during matches',()=>{const g=new Game();for(let i=0;i<4;i++)assert.ok(g.add('P'));assert.equal(g.add('Fifth'),null);g.start();assert.equal(g.add('Late'),null);});
+test('countdown, three lives, and damage from punch and kick',()=>{const g=match(),[a,b]=g.players;assert.equal(g.phase,'playing');assert.equal(a.lives,3);a.x=500;b.x=540;a.y=b.y=470;b.inv=0;a.face=1;g.hit(a,'punch');assert.equal(b.hp,88);b.inv=0;g.hit(a,'kick');assert.equal(b.hp,65);assert.ok(b.vx>0);});
+test('invulnerability prevents spawn damage',()=>{const g=match(),[a,b]=g.players;b.x=a.x+20;b.inv=2;g.hit(a,'kick');assert.equal(b.hp,100);});
+test('fall costs one life and respawn restores health',()=>{const g=match(),p=g.players[0];p.y=851;g.step(1/60);assert.equal(p.lives,2);assert.ok(p.respawn>0);for(let i=0;i<80;i++)g.step(1/60);assert.equal(p.hp,100);assert.equal(p.lives,2);});
+test('third death eliminates and announces winner',()=>{const g=match(),p=g.players[0];p.lives=1;p.y=851;g.step(1/60);assert.equal(p.lives,0);assert.equal(g.phase,'finished');assert.equal(g.winner,'B');});
+test('walking beyond the edge falls instead of clamping',()=>{const g=match(),p=g.players[0];p.x=1140;p.y=470;p.vx=100;for(let i=0;i<20;i++)g.step(1/60);assert.ok(p.y>500);});
+test('downward motion lands on an object top',()=>{const g=match(),p=g.players[0];p.x=640;p.y=390;p.vy=180;g.step(1/30);assert.equal(p.y,395);assert.ok(p.ground);});
+test('knocked-out figures fall through the mantel',()=>{const g=match(),p=g.players[0];p.hp=0;p.y=469;p.vy=150;for(let i=0;i<15;i++)g.step(1/60);assert.ok(p.y>470);});
